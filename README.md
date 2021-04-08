@@ -3,7 +3,7 @@ n8n workflows that integrate with Syncro
 
 These are workflows that we created for our MSP to work with Syncro's API. They are provided as is without any support. When working with the Syncro API, you need to use Authorization type "Header Auth" and use "Authorization" for the Name and "Bearer <token>" for the Value (chaning <token> to your API key).
 
-dialpad_to_syncro.json
+[dialpad_to_syncro.json](https://github.com/bionemesis/n8nsyncro/blob/main/dialpad_to_syncro.json)
 
 This workflow takes Dialpad call information for an answered call and pushes it into Syncro as either a ticket or an update to an existing ticket. You will need to have a workflow for each technician at this time. It also saves call/ticket information to a Google Sheet to be queried by the dialpad_to_syncro_timer.json workflow.
 
