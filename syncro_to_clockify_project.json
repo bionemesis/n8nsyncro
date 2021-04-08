@@ -1,0 +1,66 @@
+{
+  "name": "",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "syncro_to_clockify_project",
+        "responseMode": "lastNode",
+        "responseData": "allEntries",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        420,
+        300
+      ],
+      "webhookId": "syncro_to_clockify_project",
+      "notes": "Incoming Webhook that should be triggered by Syncro on new ticket (via notification sets)."
+    },
+    {
+      "parameters": {
+        "workspaceId": "606886f0c145ea559a582e76",
+        "name": "=Ticket {{$json[\"body\"][\"attributes\"][\"number\"]}} - {{$json[\"body\"][\"attributes\"][\"customer_business_then_name\"]}} [{{$json[\"body\"][\"attributes\"][\"id\"]}}]",
+        "additionalFields": {}
+      },
+      "name": "Clockify",
+      "type": "n8n-nodes-base.clockify",
+      "typeVersion": 1,
+      "position": [
+        620,
+        300
+      ],
+      "credentials": {
+        "clockifyApi": "Clockify"
+      },
+      "notes": "Create new project in Clockify with the ticket details and ticket number and ID."
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Clockify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {}
+}
