@@ -1,0 +1,385 @@
+{
+  "name": "Clockify to Syncro",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "clockify_to_syncro",
+        "responseMode": "lastNode",
+        "responseData": "allEntries",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        420,
+        350
+      ],
+      "webhookId": "clockify_to_syncro"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetId": "",
+        "range": "A:B",
+        "options": {
+          "valueInputMode": "USER_ENTERED"
+        }
+      },
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        1830,
+        350
+      ],
+      "credentials": {
+        "googleApi": "Google"
+      }
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "Syncro",
+              "value": "={{$json[\"id\"]}}"
+            },
+            {
+              "name": "Clockify",
+              "value": "={{$node[\"Webhook\"].json[\"body\"][\"id\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "ForGoogle",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1650,
+        350
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "id",
+              "value": "={{ $json[\"body\"][\"project\"][\"name\"].match(/\\[(\\d+)]/)[1] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "ForSyncro",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        730,
+        350
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "lookup",
+        "sheetId": "",
+        "range": "A:B",
+        "lookupColumn": "=Clockify",
+        "lookupValue": "={{$node[\"Webhook\"].json[\"body\"][\"id\"]}}",
+        "options": {
+          "returnAllMatches": true,
+          "valueRenderMode": "UNFORMATTED_VALUE"
+        }
+      },
+      "name": "FindMatch",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        1130,
+        350
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleApi": "Google"
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [],
+          "boolean": [
+            {
+              "value1": "={{!!Object.keys($node[\"FindMatch\"].data).length}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        350
+      ],
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "requestMethod": "POST",
+        "url": "={{$node[\"EnvVariables\"].json[\"syncro_baseurl\"]}}/api/v1/tickets/{{$node[\"ForSyncro\"].json[\"id\"]}}/timer_entry",
+        "options": {},
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "start_at",
+              "value": "={{$node[\"Webhook\"].json[\"body\"][\"timeInterval\"][\"start\"]}}"
+            },
+            {
+              "name": "end_at",
+              "value": "={{$node[\"Webhook\"].json[\"body\"][\"timeInterval\"][\"end\"]}}"
+            },
+            {
+              "name": "notes",
+              "value": "={{$node[\"Webhook\"].json[\"body\"][\"description\"]}}"
+            }
+          ]
+        }
+      },
+      "name": "NewSyncroTimer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1490,
+        350
+      ],
+      "credentials": {
+        "httpHeaderAuth": "Syncro"
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "requestMethod": "PUT",
+        "url": "={{$node[\"EnvVariables\"].json[\"syncro_baseurl\"]}}/api/v1/tickets/{{$node[\"ForSyncro\"].json[\"id\"]}}/update_timer_entry",
+        "options": {
+          "followRedirect": true
+        },
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "timer_entry_id",
+              "value": "={{$node[\"IF\"].json[\"Syncro\"]}}"
+            },
+            {
+              "name": "start_at",
+              "value": "={{$node[\"Webhook\"].json[\"body\"][\"timeInterval\"][\"start\"]}}"
+            },
+            {
+              "name": "end_at",
+              "value": "={{$node[\"Webhook\"].json[\"body\"][\"timeInterval\"][\"end\"]}}"
+            },
+            {
+              "name": "notes",
+              "value": "={{$node[\"Webhook\"].json[\"body\"][\"description\"]}}"
+            }
+          ]
+        }
+      },
+      "name": "UpdateSyncroTimer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1490,
+        580
+      ],
+      "credentials": {
+        "httpHeaderAuth": "Syncro"
+      }
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "syncro_baseurl",
+              "value": "https://subdomain.syncromsp.com"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "EnvVariables",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        580,
+        350
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "Technician 1",
+              "value": "userid"
+            },
+            {
+              "name": "Technician 2",
+              "value": "userid"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "SetTechnicians",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        870,
+        350
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "\nconst results = [];\n\nconst user = $node[\"Webhook\"].json[\"body\"][\"user\"];\n\nconst persons = items[0].json\n\nfor (key of Object.keys(persons)) {\n  if (key === user.name) {\n    results.push({ json: { id: persons[key], name: key } })\n  }\n}\n\nreturn results;"
+      },
+      "name": "MatchTechnician",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        350
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "EnvVariables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ForGoogle": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ForSyncro": {
+      "main": [
+        [
+          {
+            "node": "SetTechnicians",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "UpdateSyncroTimer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NewSyncroTimer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NewSyncroTimer": {
+      "main": [
+        [
+          {
+            "node": "ForGoogle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EnvVariables": {
+      "main": [
+        [
+          {
+            "node": "ForSyncro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FindMatch": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SetTechnicians": {
+      "main": [
+        [
+          {
+            "node": "MatchTechnician",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MatchTechnician": {
+      "main": [
+        [
+          {
+            "node": "FindMatch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "id": "3"
+}
