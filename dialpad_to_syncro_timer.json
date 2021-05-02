@@ -1,5 +1,5 @@
 {
-  "name": "",
+  "name": "Dialpad Call to Syncro Timer",
   "nodes": [
     {
       "parameters": {},
@@ -14,7 +14,7 @@
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "moeztimersyncro",
+        "path": "timersyncro",
         "responseMode": "lastNode",
         "responseData": "allEntries",
         "options": {}
@@ -23,11 +23,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
       "position": [
-        390,
-        300
+        440,
+        310
       ],
-      "webhookId": "dialpad_to_syncro_timer",
-      "notes": "Inbound Webhook from Dialpad when call ends. We have different Webhooks for each technician so you need to set the user_id accordingly."
+      "webhookId": "484b94c9-8285-4ec9-aa52-f5a41eb84d1a"
     },
     {
       "parameters": {
@@ -36,10 +35,6 @@
             {
               "name": "syncro_baseurl",
               "value": "https://subdomain.syncromsp.com"
-            },
-            {
-              "name": "user_id",
-              "value": "1234"
             }
           ]
         },
@@ -49,14 +44,14 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        590,
-        300
-      ],
-      "notes": "Change syncro_baseurl to your Syncro URL and set user_id to the technician that this Webhook is for."
+        640,
+        310
+      ]
     },
     {
       "parameters": {
         "operation": "lookup",
+        "sheetId": "xxx",
         "range": "A:B",
         "lookupColumn": "Call",
         "lookupValue": "={{$node[\"Webhook\"].json[\"body\"][\"call_id\"]}}",
@@ -66,13 +61,12 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 1,
       "position": [
-        770,
-        300
+        820,
+        310
       ],
       "credentials": {
         "googleApi": "Google"
-      },
-      "notes": "This looks up our Google sheet that keeps a record of each call ID and the ticket ID that was created for it."
+      }
     },
     {
       "parameters": {
@@ -96,7 +90,7 @@
             },
             {
               "name": "user_id",
-              "value": "={{$node[\"EnvVariables\"].parameter[\"values\"][\"string\"][1][\"value\"]}}"
+              "value": "24223"
             }
           ]
         }
@@ -105,13 +99,12 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 1,
       "position": [
-        1100,
-        300
+        1150,
+        310
       ],
       "credentials": {
         "httpHeaderAuth": "Syncro"
-      },
-      "notes": "This updates Syncro with a timer entry matching the duration of the call."
+      }
     },
     {
       "parameters": {
@@ -130,10 +123,9 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        920,
-        300
-      ],
-      "notes": "This simply confirms there is a match in Google Sheets."
+        970,
+        310
+      ]
     },
     {
       "parameters": {},
@@ -141,8 +133,8 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        1080,
-        150
+        1130,
+        160
       ]
     }
   ],
@@ -199,6 +191,7 @@
       ]
     }
   },
-  "active": false,
-  "settings": {}
+  "active": true,
+  "settings": {},
+  "id": "8"
 }

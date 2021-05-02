@@ -1,5 +1,5 @@
 {
-  "name": "",
+  "name": "Dialpad to Syncro",
   "nodes": [
     {
       "parameters": {},
@@ -7,8 +7,8 @@
       "type": "n8n-nodes-base.start",
       "typeVersion": 1,
       "position": [
-        250,
-        300
+        190,
+        440
       ]
     },
     {
@@ -21,18 +21,17 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 1,
       "position": [
-        710,
-        300
+        350,
+        180
       ],
       "credentials": {
         "httpHeaderAuth": "Syncro"
-      },
-      "notes": "This will take the inbound webhook information and search for customers/contacts matching that number (stripped of +1 and anything non-numeric)."
+      }
     },
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "fromsyncro",
+        "path": "moezdialpad",
         "responseMode": "lastNode",
         "responseData": "allEntries",
         "options": {}
@@ -41,10 +40,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
       "position": [
-        420,
-        300
+        -60,
+        180
       ],
-      "webhookId": "dialpad_to_syncro"
+      "webhookId": "ec452bb5-58d9-4e0d-9cd2-c6df1c2cd957"
     },
     {
       "parameters": {
@@ -83,13 +82,12 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 1,
       "position": [
-        1550,
-        230
+        1190,
+        110
       ],
       "credentials": {
         "httpHeaderAuth": "Syncro"
-      },
-      "notes": "This creates a new ticket with the information that a contact was connected to a technician."
+      }
     },
     {
       "parameters": {
@@ -101,13 +99,12 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 1,
       "position": [
-        1220,
-        160
+        860,
+        40
       ],
       "credentials": {
         "httpHeaderAuth": "Syncro"
-      },
-      "notes": "This searches for any open tickets in Syncro belonging to this contact."
+      }
     },
     {
       "parameters": {
@@ -132,15 +129,14 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        1360,
-        160
-      ],
-      "notes": "This determines if there is only a single ticket open for this contact. If there are more than 1 or no tickets open, it creates a new one. This is done because there is no easy way to know which open ticket pertains to their issue, so I'd rather create a new one and merge it if necessary."
+        1000,
+        40
+      ]
     },
     {
       "parameters": {
         "operation": "append",
-        "sheetId": "",
+        "sheetId": "xxx",
         "range": "A:B",
         "options": {
           "valueInputMode": "USER_ENTERED"
@@ -150,13 +146,12 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 1,
       "position": [
-        1840,
-        80
+        1480,
+        -40
       ],
       "credentials": {
         "googleApi": "Google"
-      },
-      "notes": "This saves the call ID and ticket ID to Google Sheets so that we can query that later when the call ends."
+      }
     },
     {
       "parameters": {
@@ -179,10 +174,9 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        1700,
-        80
-      ],
-      "notes": "This prepares the call ID and ticket ID for saving to Google Sheets."
+        1340,
+        -40
+      ]
     },
     {
       "parameters": {
@@ -215,13 +209,12 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 1,
       "position": [
-        1550,
-        80
+        1190,
+        -40
       ],
       "credentials": {
         "httpHeaderAuth": "Syncro"
-      },
-      "notes": "This updates the ticket in Syncro that the contact called and was connected with a technician."
+      }
     },
     {
       "parameters": {
@@ -244,15 +237,14 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        1700,
-        230
-      ],
-      "notes": "This prepares the call ID and ticket ID for saving to Google Sheets."
+        1340,
+        110
+      ]
     },
     {
       "parameters": {
         "operation": "append",
-        "sheetId": "",
+        "sheetId": "xxx",
         "range": "A:B",
         "options": {
           "valueInputMode": "USER_ENTERED"
@@ -262,13 +254,12 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 1,
       "position": [
-        1840,
-        230
+        1480,
+        110
       ],
       "credentials": {
         "googleApi": "Google"
-      },
-      "notes": "This saves the call ID and ticket ID to Google Sheets so that we can query that later when the call ends."
+      }
     },
     {
       "parameters": {},
@@ -276,8 +267,8 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        1190,
-        340
+        830,
+        220
       ]
     },
     {
@@ -288,11 +279,10 @@
       "type": "n8n-nodes-base.function",
       "typeVersion": 1,
       "position": [
-        870,
-        300
+        510,
+        180
       ],
-      "alwaysOutputData": false,
-      "notes": "This separates out the contacts table from the JSON returned by the Syncro search."
+      "alwaysOutputData": false
     },
     {
       "parameters": {
@@ -312,10 +302,9 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        1030,
-        300
-      ],
-      "notes": "This confirms that a single contact exists from the search results. If there are no matches or more than one match, it does not proceed."
+        670,
+        180
+      ]
     },
     {
       "parameters": {
@@ -325,10 +314,9 @@
       "type": "n8n-nodes-base.function",
       "typeVersion": 1,
       "position": [
-        870,
-        490
-      ],
-      "notes": "This separates out the customers- table from the JSON returned by the Syncro search."
+        510,
+        370
+      ]
     },
     {
       "parameters": {
@@ -348,10 +336,9 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        1030,
-        490
-      ],
-      "notes": "This confirms that a single customer exists from the search results. If there are no matches or more than one match, it does not proceed."
+        670,
+        370
+      ]
     },
     {
       "parameters": {},
@@ -359,8 +346,8 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        1170,
-        640
+        810,
+        520
       ]
     },
     {
@@ -396,13 +383,12 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 1,
       "position": [
-        1220,
-        480
+        860,
+        360
       ],
       "credentials": {
         "httpHeaderAuth": "Syncro"
-      },
-      "notes": "This creates a new ticket with the information that a customer was connected to a technician."
+      }
     },
     {
       "parameters": {
@@ -425,15 +411,14 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        1400,
-        480
-      ],
-      "notes": "This prepares the call ID and ticket ID for saving to Google Sheets."
+        1040,
+        360
+      ]
     },
     {
       "parameters": {
         "operation": "append",
-        "sheetId": "",
+        "sheetId": "xxx",
         "range": "A:B",
         "options": {
           "valueInputMode": "USER_ENTERED"
@@ -443,13 +428,12 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 1,
       "position": [
-        1570,
-        480
+        1210,
+        360
       ],
       "credentials": {
         "googleApi": "Google"
-      },
-      "notes": "This saves the call ID and ticket ID to Google Sheets so that we can query that later when the call ends."
+      }
     },
     {
       "parameters": {
@@ -457,7 +441,7 @@
           "string": [
             {
               "name": "syncro_baseurl",
-              "value": "https://sudbdomain.syncromsp.com"
+              "value": "https://subdomain.syncromsp.com"
             },
             {
               "name": "user_id",
@@ -471,10 +455,38 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        570,
-        300
-      ],
-      "notes": "Change value of syncro_baseurl to your Syncro URL. Change value of user_id to the user_id that you want this webhook to work for."
+        210,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$node[\"Webhook\"].json[\"body\"][\"direction\"]}}",
+              "value2": "inbound"
+            }
+          ]
+        }
+      },
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        70,
+        180
+      ]
+    },
+    {
+      "parameters": {},
+      "name": "NoOp2",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        70,
+        370
+      ]
     }
   ],
   "connections": {
@@ -482,7 +494,7 @@
       "main": [
         [
           {
-            "node": "EnvVariables",
+            "node": "IF",
             "type": "main",
             "index": 0
           }
@@ -668,8 +680,27 @@
           }
         ]
       ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "EnvVariables",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NoOp2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": false,
-  "settings": {}
+  "active": true,
+  "settings": {},
+  "id": "1"
 }

@@ -1,5 +1,5 @@
 {
-  "name": "",
+  "name": "Syncro Status Update Clockify",
   "nodes": [
     {
       "parameters": {},
@@ -14,7 +14,7 @@
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "syncro_to_clockify",
+        "path": "4500d16f-5d43-4ae7-887e-376eecaeec17",
         "responseMode": "lastNode",
         "responseData": "allEntries",
         "options": {}
@@ -23,64 +23,47 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
       "position": [
-        400,
-        300
+        560,
+        310
       ],
-      "webhookId": "syncro_to_clockify",
-      "notes": "Webhook that should be triggered by Syncro when a ticket status changes, via notification sets."
+      "webhookId": "3300d16f-5d43-4ae7-887e-376eecaeec17"
     },
     {
       "parameters": {
         "operation": "getAll",
-        "workspaceId": "",
+        "workspaceId": "xxx",
         "returnAll": true,
         "additionalFields": {
-          "archived": false
+          "archived": true,
+          "name": "=Ticket {{$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"number\"]}} - {{$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"customer_business_then_name\"]}} [{{$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"id\"]}}]"
         }
       },
       "name": "Clockify",
       "type": "n8n-nodes-base.clockify",
       "typeVersion": 1,
       "position": [
-        800,
-        300
+        960,
+        310
       ],
       "credentials": {
         "clockifyApi": "Clockify"
-      },
-      "notes": "Get all projects from Clockify."
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "string": [
-            {
-              "value1": "={{$node[\"Clockify\"].json[\"name\"]}}",
-              "value2": "=Ticket {{$item(0).$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"number\"]}} - {{$item(0).$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"customer_business_then_name\"]}} [{{$item(0).$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"id\"]}}]"
-            }
-          ]
-        }
-      },
-      "name": "IF",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 1,
-      "position": [
-        960,
-        300
-      ],
-      "notes": "Compares the ticket ID for Syncro (webhook) with the project name and confirms there is a match."
+      }
     },
     {
       "parameters": {
         "authentication": "headerAuth",
         "requestMethod": "PUT",
-        "url": "=https://api.clockify.me/api/v1/workspaces/{{$node[\"Clockify\"].parameter[\"workspaceId\"]}}/projects/{{$node[\"IF\"].json[\"id\"]}}",
+        "url": "=https://api.clockify.me/api/v1/workspaces/{{$node[\"Clockify\"].parameter[\"workspaceId\"]}}/projects/{{$json[\"id\"]}}",
         "options": {},
         "bodyParametersUi": {
           "parameter": [
             {
               "name": "archived",
               "value": "false"
+            },
+            {
+              "name": "isPublic",
+              "value": "true"
             }
           ]
         },
@@ -92,13 +75,12 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 1,
       "position": [
-        1150,
-        290
+        1130,
+        310
       ],
       "credentials": {
         "httpHeaderAuth": "Clockify API"
-      },
-      "notes": "Updates the project in Clockify to insure it is not archived."
+      }
     },
     {
       "parameters": {
@@ -116,62 +98,45 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        570,
-        300
-      ],
-      "notes": "Determine if the status change is Resolved or not and take a different path based on that. If it Resolved, we archive the project in Clockify and if it's any other status change, we make sure the project is not archived."
+        730,
+        310
+      ]
     },
     {
       "parameters": {
         "operation": "getAll",
-        "workspaceId": "",
+        "workspaceId": "xxx",
         "returnAll": true,
         "additionalFields": {
-          "archived": false
+          "archived": false,
+          "name": "=Ticket {{$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"number\"]}} - {{$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"customer_business_then_name\"]}} [{{$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"id\"]}}]"
         }
       },
       "name": "Clockify1",
       "type": "n8n-nodes-base.clockify",
       "typeVersion": 1,
       "position": [
-        800,
-        530
+        960,
+        540
       ],
       "credentials": {
         "clockifyApi": "Clockify"
-      },
-      "notes": "Get all projects from Clockify."
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "string": [
-            {
-              "value1": "={{$node[\"Clockify1\"].json[\"name\"]}}",
-              "value2": "=Ticket {{$item(0).$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"number\"]}} - {{$item(0).$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"customer_business_then_name\"]}} [{{$item(0).$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"id\"]}}]"
-            }
-          ]
-        }
-      },
-      "name": "IF2",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 1,
-      "position": [
-        970,
-        530
-      ],
-      "notes": "Compares the ticket ID for Syncro (webhook) with the project name and confirms there is a match."
+      }
     },
     {
       "parameters": {
         "authentication": "headerAuth",
         "requestMethod": "PUT",
-        "url": "=https://api.clockify.me/api/v1/workspaces/{{$node[\"Clockify1\"].parameter[\"workspaceId\"]}}/projects/{{$node[\"IF2\"].json[\"id\"]}}",
+        "url": "=https://api.clockify.me/api/v1/workspaces/{{$node[\"Clockify1\"].parameter[\"workspaceId\"]}}/projects/{{$node[\"Clockify1\"].json[\"id\"]}}",
         "options": {},
         "bodyParametersUi": {
           "parameter": [
             {
               "name": "archived",
+              "value": "true"
+            },
+            {
+              "name": "isPublic",
               "value": "true"
             }
           ]
@@ -184,13 +149,12 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 1,
       "position": [
-        1150,
-        530
+        1130,
+        540
       ],
       "credentials": {
         "httpHeaderAuth": "Clockify API"
-      },
-      "notes": "Updates the project in Clockify to insure it is archived."
+      }
     }
   ],
   "connections": {
@@ -206,17 +170,6 @@
       ]
     },
     "Clockify": {
-      "main": [
-        [
-          {
-            "node": "IF",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "IF": {
       "main": [
         [
           {
@@ -249,17 +202,6 @@
       "main": [
         [
           {
-            "node": "IF2",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "IF2": {
-      "main": [
-        [
-          {
             "node": "HTTP Request1",
             "type": "main",
             "index": 0
@@ -268,6 +210,7 @@
       ]
     }
   },
-  "active": false,
-  "settings": {}
+  "active": true,
+  "settings": {},
+  "id": "5"
 }

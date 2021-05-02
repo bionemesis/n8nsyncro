@@ -7,14 +7,14 @@
       "type": "n8n-nodes-base.start",
       "typeVersion": 1,
       "position": [
-        250,
-        300
+        170,
+        180
       ]
     },
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "clockify_to_syncro",
+        "path": "82b654d7-aeb2-4cc1-97a8-0ebd1a729202",
         "responseMode": "lastNode",
         "responseData": "allEntries",
         "options": {}
@@ -23,15 +23,15 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
       "position": [
-        420,
+        280,
         350
       ],
-      "webhookId": "clockify_to_syncro"
+      "webhookId": "82b654d7-aeb2-4cc1-97a8-0ebd1a729202"
     },
     {
       "parameters": {
         "operation": "append",
-        "sheetId": "",
+        "sheetId": "xxx",
         "range": "A:B",
         "options": {
           "valueInputMode": "USER_ENTERED"
@@ -97,7 +97,7 @@
     {
       "parameters": {
         "operation": "lookup",
-        "sheetId": "",
+        "sheetId": "xxx",
         "range": "A:B",
         "lookupColumn": "=Clockify",
         "lookupValue": "={{$node[\"Webhook\"].json[\"body\"][\"id\"]}}",
@@ -158,6 +158,10 @@
             {
               "name": "notes",
               "value": "={{$node[\"Webhook\"].json[\"body\"][\"description\"]}}"
+            },
+            {
+              "name": "user_id",
+              "value": "={{$node[\"MatchTechnician\"].json[\"id\"]}}"
             }
           ]
         }
@@ -188,16 +192,20 @@
               "value": "={{$node[\"IF\"].json[\"Syncro\"]}}"
             },
             {
-              "name": "start_at",
+              "name": "start_time",
               "value": "={{$node[\"Webhook\"].json[\"body\"][\"timeInterval\"][\"start\"]}}"
             },
             {
-              "name": "end_at",
+              "name": "end_time",
               "value": "={{$node[\"Webhook\"].json[\"body\"][\"timeInterval\"][\"end\"]}}"
             },
             {
               "name": "notes",
               "value": "={{$node[\"Webhook\"].json[\"body\"][\"description\"]}}"
+            },
+            {
+              "name": "user_id",
+              "value": "={{$node[\"MatchTechnician\"].json[\"id\"]}}"
             }
           ]
         }
@@ -239,12 +247,12 @@
         "values": {
           "string": [
             {
-              "name": "Technician 1",
-              "value": "userid"
+              "name": "Tech 1",
+              "value": "1234"
             },
             {
-              "name": "Technician 2",
-              "value": "userid"
+              "name": "Tech 2",
+              "value": "5678"
             }
           ]
         },
@@ -269,6 +277,36 @@
         1000,
         350
       ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"body\"][\"project\"][\"name\"]}}",
+              "operation": "contains",
+              "value2": "Ticket"
+            }
+          ]
+        }
+      },
+      "name": "IF1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        420,
+        350
+      ]
+    },
+    {
+      "parameters": {},
+      "name": "NoOp",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        480,
+        520
+      ]
     }
   ],
   "connections": {
@@ -276,7 +314,7 @@
       "main": [
         [
           {
-            "node": "EnvVariables",
+            "node": "IF1",
             "type": "main",
             "index": 0
           }
@@ -372,6 +410,24 @@
         [
           {
             "node": "FindMatch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF1": {
+      "main": [
+        [
+          {
+            "node": "EnvVariables",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NoOp",
             "type": "main",
             "index": 0
           }

@@ -1,5 +1,5 @@
 {
-  "name": "Syncro Alert to Opsgenie",
+  "name": "Server Offline to Opsgenie",
   "nodes": [
     {
       "parameters": {},
@@ -14,7 +14,7 @@
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "syncro_alert_to_opsgenie",
+        "path": "b9d43f0f-c568-4792-8f72-83a5c9edea43",
         "responseMode": "lastNode",
         "responseData": "allEntries",
         "options": {}
@@ -26,7 +26,7 @@
         210,
         300
       ],
-      "webhookId": "syncro_alert_to_opsgenie"
+      "webhookId": "b9d43f0f-c568-4792-8f72-83a5c9edea43"
     },
     {
       "parameters": {
@@ -50,26 +50,6 @@
       "typeVersion": 1,
       "position": [
         530,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "string": [
-            {
-              "value1": "={{$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"resolved\"]}}",
-              "operation": "notEqual",
-              "value2": "true"
-            }
-          ]
-        }
-      },
-      "name": "IF",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 1,
-      "position": [
-        800,
         300
       ]
     },
@@ -100,8 +80,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 1,
       "position": [
-        990,
-        150
+        920,
+        170
       ],
       "credentials": {
         "httpHeaderAuth": "OpsGenie"
@@ -126,7 +106,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 1,
       "position": [
-        990,
+        920,
         370
       ],
       "credentials": {
@@ -142,7 +122,8 @@
               "value2": "agent_offline_trigger"
             }
           ]
-        }
+        },
+        "combineOperation": "any"
       },
       "name": "IFServerOffline",
       "type": "n8n-nodes-base.if",
@@ -160,6 +141,24 @@
       "position": [
         530,
         470
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"resolved\"]}}"
+            }
+          ]
+        }
+      },
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        690,
+        300
       ]
     }
   ],
@@ -186,24 +185,6 @@
         ]
       ]
     },
-    "IF": {
-      "main": [
-        [
-          {
-            "node": "Create Alert",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Close Alert",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "IFServerOffline": {
       "main": [
         [
@@ -216,6 +197,24 @@
         [
           {
             "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Create Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Close Alert",
             "type": "main",
             "index": 0
           }
