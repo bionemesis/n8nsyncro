@@ -1,20 +1,9 @@
 {
-  "name": "Server Offline to Opsgenie",
   "nodes": [
-    {
-      "parameters": {},
-      "name": "Start",
-      "type": "n8n-nodes-base.start",
-      "typeVersion": 1,
-      "position": [
-        70,
-        300
-      ]
-    },
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "b9d43f0f-c568-4792-8f72-83a5c9edea43",
+        "path": "fromsyncro",
         "responseMode": "lastNode",
         "responseData": "allEntries",
         "options": {}
@@ -26,7 +15,7 @@
         210,
         300
       ],
-      "webhookId": "b9d43f0f-c568-4792-8f72-83a5c9edea43"
+      "webhookId": "fromsyncro"
     },
     {
       "parameters": {
@@ -114,26 +103,6 @@
       }
     },
     {
-      "parameters": {
-        "conditions": {
-          "string": [
-            {
-              "value1": "={{$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"properties\"][\"trigger\"]}}",
-              "value2": "agent_offline_trigger"
-            }
-          ]
-        },
-        "combineOperation": "any"
-      },
-      "name": "IFServerOffline",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 1,
-      "position": [
-        360,
-        300
-      ]
-    },
-    {
       "parameters": {},
       "name": "NoOp",
       "type": "n8n-nodes-base.noOp",
@@ -160,6 +129,26 @@
         690,
         300
       ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"properties\"][\"trigger\"]}}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "agent_offline_trigger"
+            }
+          ]
+        }
+      },
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        360,
+        300
+      ]
     }
   ],
   "connections": {
@@ -167,7 +156,7 @@
       "main": [
         [
           {
-            "node": "IFServerOffline",
+            "node": "Switch",
             "type": "main",
             "index": 0
           }
@@ -179,24 +168,6 @@
         [
           {
             "node": "IF",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "IFServerOffline": {
-      "main": [
-        [
-          {
-            "node": "Set",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "NoOp",
             "type": "main",
             "index": 0
           }
@@ -220,9 +191,24 @@
           }
         ]
       ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
-  },
-  "active": true,
-  "settings": {},
-  "id": "11"
+  }
 }
